@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.8.2'
+    ownerVersion = '1.0.12'
+    jacksonVersion = '2.13.2'
+    lombokVersion = '1.18.24'
+    slf4jVersion = '1.7.36'
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+
+    // https://mvnrepository.com/artifact/org.aeonbits.owner/owner
+    testImplementation("org.aeonbits.owner:owner:$ownerVersion") {
+        because("we want a reduction in boilerplate code related to reading/using values from .properties files in Java")
+    }
+
+    // logging facade
+    // https://mvnrepository.com/artifact/org.slf4j
+    testImplementation "org.slf4j:slf4j-api:$slf4jVersion"
+    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
+
+    // jackson - yaml (de)serialization
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+    testImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    // lombok - boilerplate-reducing annotations
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    testImplementation "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// shared config for custom gradle tasks of type "test"
+tasks.withType(Test) {
+    useJUnitPlatform() {
+        includeTags(project.hasProperty('tags') ? project.getProperty('tags') : "none() | any()")
+    }
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+    testLogging.showStandardStreams = true
+    group = "verification"
+    systemProperties = [
+            "target_env": project.hasProperty('target_env') ? project.getProperty('target_env') : 'qa',
+            // create testrail report after test run
+            "testrail": project.hasProperty('testrail') ? project.getProperty('testrail') : false,
+            // override property value defined in junit-platform.properties if provided via cmd
+            'junit.jupiter.execution.parallel.enabled': project.hasProperty('parallel') ? project.getProperty('parallel') : true
+    ]
+}
