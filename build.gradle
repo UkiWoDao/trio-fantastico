@@ -11,15 +11,25 @@ repositories {
 
 ext {
     junitVersion = '5.8.2'
+    junitPlatformVersion = '1.8.2'
+    junitConsoleVersion = '1.8.2'
     ownerVersion = '1.0.12'
     jacksonVersion = '2.13.2'
     lombokVersion = '1.18.24'
     slf4jVersion = '1.7.36'
+    restAssuredVersion = '4.5.1'
 }
 
 dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    // https://mvnrepository.com/artifact/org.junit.platform/junit-platform-suite-api
+    testImplementation "org.junit.platform:junit-platform-suite-api:$junitPlatformVersion"
+    // https://mvnrepository.com/artifact/org.junit.platform/junit-platform-runner
+    testImplementation "org.junit.platform:junit-platform-runner:$junitPlatformVersion"
+    testImplementation ("org.junit.platform:junit-platform-console-standalone:$junitConsoleVersion") {
+        because("we want to be able to run our junit5 test through the command line")
+    }
 
     // https://mvnrepository.com/artifact/org.aeonbits.owner/owner
     testImplementation("org.aeonbits.owner:owner:$ownerVersion") {
@@ -42,6 +52,9 @@ dependencies {
     testImplementation "org.projectlombok:lombok:$lombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
     testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    // https://mvnrepository.com/artifact/io.rest-assured/rest-assured
+    testImplementation "io.rest-assured:rest-assured:$restAssuredVersion"
 }
 
 test {

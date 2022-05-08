@@ -1,4 +1,4 @@
-package config.yamlbased;
+package com.triofantastico.practiceproject.config.yamlbased;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -18,7 +18,7 @@ public class YamlConfigHandler {
     private YamlConfigHandler() { throw new AssertionError("Instantiation attempted from within class"); }
 
     public static void setConfigByEnvironmentName(String envName) throws IOException {
-        final String yamlPropertiesPath = "src/test/resources/properties.yml";
+        final String yamlPropertiesPath = "src/test/resources/environment.yaml";
         File yamlFile = new File(yamlPropertiesPath);
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         YamlConfigModel environmentList = mapper.readValue(yamlFile, YamlConfigModel.class);

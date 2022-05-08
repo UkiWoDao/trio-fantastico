@@ -1,8 +1,8 @@
-package config.propertybased;
+package com.triofantastico.practiceproject.config.propertybased;
 
 import org.aeonbits.owner.Config;
 
-import static constant.PropertyNameConstant.TARGET_ENV;
+import static com.triofantastico.practiceproject.constant.PropertyNameConstant.TARGET_ENV;
 
 @Config.Sources("file:${user.dir}/src/test/resources/properties/auth.properties")
 @Config.LoadPolicy(Config.LoadType.MERGE)

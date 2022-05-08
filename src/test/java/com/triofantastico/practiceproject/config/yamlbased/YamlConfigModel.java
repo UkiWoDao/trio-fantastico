@@ -1,4 +1,4 @@
-package config.yamlbased;
+package com.triofantastico.practiceproject.config.yamlbased;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

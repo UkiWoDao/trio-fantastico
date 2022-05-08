@@ -1,4 +1,4 @@
-package constant;
+package com.triofantastico.practiceproject.constant;
 
 public final class PropertyNameConstant {
 

@@ -1,4 +1,4 @@
-package config.propertybased;
+package com.triofantastico.practiceproject.config.propertybased;
 
 class OwnerConstant {
 

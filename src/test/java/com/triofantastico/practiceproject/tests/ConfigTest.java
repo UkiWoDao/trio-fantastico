@@ -1,6 +1,6 @@
-package tests;
+package com.triofantastico.practiceproject.tests;
 
-import config.propertybased.ConfigurationManager;
+import com.triofantastico.practiceproject.config.propertybased.ConfigurationManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

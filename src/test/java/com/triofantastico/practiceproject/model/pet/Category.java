@@ -1,4 +1,5 @@
-package model.pet;
+package com.triofantastico.practiceproject.model.pet;
+
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class Tag {
+public class Category {
 
     private Integer id;
     private String name;

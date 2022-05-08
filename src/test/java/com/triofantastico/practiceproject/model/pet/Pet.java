@@ -1,4 +1,4 @@
-package model.pet;
+package com.triofantastico.practiceproject.model.pet;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 @Builder
-public class GetPetById {
+public class Pet {
 
     private Long id;
     private Category category;
