@@ -1,14 +1,14 @@
 package com.triofantastico.practiceproject.model.pet;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pet {
 
     private Long id;
