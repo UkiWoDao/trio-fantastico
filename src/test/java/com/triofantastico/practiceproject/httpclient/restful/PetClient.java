@@ -11,4 +11,5 @@ public class PetClient extends RestfulClient {
     public Response add(Pet pet) {
         return sendRequest(getCommonReqSpec().baseUri(PET_URI).body(pet), Method.POST);
     }
+    public Response get(Pet pet) { return sendRequest(getCommonReqSpec().baseUri(PET_URI + "/" + pet.getId()), Method.GET); }
 }
