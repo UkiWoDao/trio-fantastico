@@ -8,8 +8,7 @@ public class PetClient extends RestfulClient {
 
     private static final String PET_URI = PETSTORE_BASE_URL + "/pet";
 
-    public Response add(Pet pet) {
-        return sendRequest(getCommonReqSpec().baseUri(PET_URI).body(pet), Method.POST);
-    }
+    public Response add(Pet pet) { return sendRequest(getCommonReqSpec().baseUri(PET_URI).body(pet), Method.POST); }
     public Response get(Pet pet) { return sendRequest(getCommonReqSpec().baseUri(PET_URI + "/" + pet.getId()), Method.GET); }
+    public Response put(Pet pet) { return sendRequest(getCommonReqSpec().baseUri(PET_URI).body(pet), Method.PUT); }
 }
