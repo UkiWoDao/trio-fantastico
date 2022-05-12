@@ -57,4 +57,36 @@ class PetTest {
         Assertions.assertEquals(createdPet.getName(), fetchedPet.getName());
         Assertions.assertEquals(createdPet.getStatus(), fetchedPet.getStatus());
     }
+
+    @Test
+    void update_existing_pet_should_retrieve_pet_with_new_values() throws JsonProcessingException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        PetClient petClient = new PetClient();
+        Pet desiredPet = Pet.builder()
+                .name("testNameUnique")
+                .status("testStatusUnique")
+                .build();
+
+        Response createdPetResponse = petClient.add(desiredPet);
+        Pet createdPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
+        Assertions.assertEquals(HttpStatus.SC_OK, createdPetResponse.getStatusCode());
+
+        // ACT
+        Pet desiredUpdatedPet = Pet.builder()
+                .id(createdPet.getId())
+                .name("testNameUpdated")
+                .status("testStatusUpdated")
+                .build();
+
+        Response createUpdatePetResponse = petClient.put(desiredUpdatedPet);
+        Pet updateAnExistingPet = objectMapper.readValue(createUpdatePetResponse.getBody().asString(), Pet.class);
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_OK, createUpdatePetResponse.getStatusCode());
+        Assertions.assertEquals(desiredUpdatedPet.getId(), updateAnExistingPet.getId());
+        Assertions.assertEquals(desiredUpdatedPet.getName(), updateAnExistingPet.getName());
+        Assertions.assertEquals(desiredUpdatedPet.getStatus(), updateAnExistingPet.getStatus());
+    }
 }
