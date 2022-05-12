@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.triofantastico.practiceproject.httpclient.restful.PetClient;
 import io.restassured.response.Response;
 import com.triofantastico.practiceproject.model.pet.Pet;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 class PetTest {
 
@@ -74,10 +77,13 @@ class PetTest {
         Assertions.assertEquals(HttpStatus.SC_OK, createdPetResponse.getStatusCode());
 
         // ACT
+        Random random = new Random();
+        String randomStatus = "status" + random.nextInt(99999);
+
         Pet desiredUpdatedPet = Pet.builder()
                 .id(createdPet.getId())
-                .name("testNameUpdated")
-                .status("testStatusUpdated")
+                .name(RandomStringUtils.randomAlphabetic(10))
+                .status(randomStatus)
                 .build();
 
         Response createUpdatePetResponse = petClient.put(desiredUpdatedPet);
