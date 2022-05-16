@@ -79,3 +79,9 @@ tasks.withType(Test) {
             'junit.jupiter.execution.parallel.enabled': project.hasProperty('parallel') ? project.getProperty('parallel') : false
     ]
 }
+
+task wip(type: Test) {
+    useJUnitPlatform() {
+        includeTags "wip"
+    }
+}

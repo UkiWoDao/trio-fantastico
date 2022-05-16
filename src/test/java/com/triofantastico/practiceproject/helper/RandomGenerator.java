@@ -8,7 +8,7 @@ public final class RandomGenerator {
         throw new AssertionError("Instantiation attempted from within class");
     }
 
-    public static Integer getRandomNumber(int min, int max) {
+    public static Integer getRandomNumberFromRange(int min, int max) {
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
         return min + threadLocalRandom.nextInt(max);
     }
