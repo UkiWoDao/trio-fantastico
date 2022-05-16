@@ -3,6 +3,8 @@ package com.triofantastico.practiceproject.tests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.triofantastico.practiceproject.httpclient.restful.PetClient;
+import com.triofantastico.practiceproject.model.pet.Category;
+import com.triofantastico.practiceproject.model.pet.Tag;
 import io.restassured.response.Response;
 import com.triofantastico.practiceproject.model.pet.Pet;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -10,6 +12,9 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 class PetTest {
@@ -69,7 +74,16 @@ class PetTest {
         PetClient petClient = new PetClient();
         Pet desiredPet = Pet.builder()
                 .name("testNameUnique")
+                .category(Category.builder()
+                        .name("testCategoryUnique")
+                        .build())
                 .status("testStatusUnique")
+                .photoUrls(new ArrayList<String>(List.of("testPhotoUrls")))
+                .tags(new ArrayList<Tag>(List.of(
+                        Tag.builder()
+                                .name("testTagNameUnique")
+                                .build()
+                )))
                 .build();
 
         Response createdPetResponse = petClient.add(desiredPet);
@@ -83,7 +97,16 @@ class PetTest {
         Pet desiredUpdatedPet = Pet.builder()
                 .id(createdPet.getId())
                 .name(RandomStringUtils.randomAlphabetic(10))
+                .category(Category.builder()
+                        .name(RandomStringUtils.randomAlphabetic(10))
+                        .build())
                 .status(randomStatus)
+                .photoUrls(new ArrayList<String>(List.of(RandomStringUtils.randomAlphabetic(10))))
+                .tags(new ArrayList<Tag>(List.of(
+                        Tag.builder()
+                                .name(RandomStringUtils.randomAlphabetic(10))
+                                .build()
+                )))
                 .build();
 
         Response createUpdatePetResponse = petClient.put(desiredUpdatedPet);
@@ -94,5 +117,8 @@ class PetTest {
         Assertions.assertEquals(desiredUpdatedPet.getId(), updateAnExistingPet.getId());
         Assertions.assertEquals(desiredUpdatedPet.getName(), updateAnExistingPet.getName());
         Assertions.assertEquals(desiredUpdatedPet.getStatus(), updateAnExistingPet.getStatus());
+        Assertions.assertEquals(desiredUpdatedPet.getCategory().getName(), updateAnExistingPet.getCategory().getName());
+        Assertions.assertEquals(desiredUpdatedPet.getPhotoUrls().get(0), updateAnExistingPet.getPhotoUrls().get(0));
+        Assertions.assertEquals(desiredUpdatedPet.getTags().get(0).getName(), updateAnExistingPet.getTags().get(0).getName());
     }
 }
