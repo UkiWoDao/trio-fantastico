@@ -32,4 +32,98 @@ public class OrderTest {
         Assertions.assertEquals(createdOrder.getStatus(), desiredOrder.getStatus());
         Assertions.assertEquals(createdOrder.getComplete(), desiredOrder.getComplete());
     }
+
+    @Test
+    void get_store_inventory()  {
+        // ARRANGE
+        OrderClient orderClient = new OrderClient();
+
+        // ACT
+        Response response = orderClient.getInventory();
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+    }
+
+    @Test
+    void delete_created_order() throws JsonProcessingException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        OrderClient orderClient = new OrderClient();
+        Order desiredOrder = Order.createValidRandomOrder();
+
+        // ACT
+        Response response = orderClient.post(desiredOrder);
+        Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
+        Integer orderId = Math.toIntExact(createdOrder.getId());
+
+        Response deleteResponse = orderClient.delete(orderId);
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
+        Assertions.assertEquals("200", deleteResponse.jsonPath().get("code").toString());
+    }
+
+    @Test
+    void delete_order_with_negative_id() throws JsonProcessingException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        OrderClient orderClient = new OrderClient();
+        Order desiredOrder = Order.createValidRandomOrder();
+
+        // ACT
+        Response response = orderClient.post(desiredOrder);
+        Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
+        Integer orderId = Math.toIntExact(createdOrder.getId()*-1);
+
+        Response deleteResponse = orderClient.delete(orderId);
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
+        Assertions.assertEquals("Order Not Found", deleteResponse.jsonPath().get("message").toString());
+    }
+
+    @Test
+    void find_valid_purchase_order_by_id() throws JsonProcessingException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        OrderClient orderClient = new OrderClient();
+        Order desiredOrder = Order.createValidRandomOrder();
+
+        // ACT
+        Response response = orderClient.post(desiredOrder);
+        Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
+        Integer orderId = Math.toIntExact(createdOrder.getId());
+
+        Response fetchValidOrderId = orderClient.getOrderById(orderId);
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_OK, fetchValidOrderId.getStatusCode());
+    }
+
+    @Test
+    void not_valid_purchase_order_by_id() throws JsonProcessingException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        OrderClient orderClient = new OrderClient();
+        Order desiredOrder = Order.createValidRandomOrder();
+
+        // ACT
+        Response response = orderClient.post(desiredOrder);
+        Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
+        Integer orderId = Math.toIntExact(createdOrder.getId()*-1);
+
+        Response fetchNotValidOrderId = orderClient.getOrderById(orderId);
+
+        // ASSERT
+        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, fetchNotValidOrderId.getStatusCode());
+        Assertions.assertEquals("1", fetchNotValidOrderId.jsonPath().get("code").toString());
+        Assertions.assertEquals("error", fetchNotValidOrderId.jsonPath().get("type").toString());
+        Assertions.assertEquals("Order not found", fetchNotValidOrderId.jsonPath().get("message").toString());
+    }
+
 }
