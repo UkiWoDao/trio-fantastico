@@ -2,6 +2,8 @@ package com.triofantastico.practiceproject.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.triofantastico.practiceproject.constant.StatusConstant;
+import com.triofantastico.practiceproject.helper.RandomGenerator;
 import com.triofantastico.practiceproject.httpclient.restful.OrderClient;
 import com.triofantastico.practiceproject.model.order.Order;
 import io.restassured.response.Response;
@@ -9,7 +11,7 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class OrderTest {
+class OrderTest {
 
     @Test
     void store_valid_petstore_order() throws JsonProcessingException {
@@ -62,7 +64,7 @@ public class OrderTest {
 
         // ASSERT
         Assertions.assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
-        Assertions.assertEquals("200", deleteResponse.jsonPath().get("code").toString());
+        Assertions.assertEquals(StatusConstant.STATUS_CODE_OK, deleteResponse.jsonPath().get("code").toString());
     }
 
     @Test
@@ -76,13 +78,13 @@ public class OrderTest {
         // ACT
         Response response = orderClient.post(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
-        Integer orderId = Math.toIntExact(createdOrder.getId()*-1);
+        Integer orderId = RandomGenerator.getNegative(createdOrder.getId());
 
         Response deleteResponse = orderClient.delete(orderId);
 
         // ASSERT
-        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
-        Assertions.assertEquals("Order Not Found", deleteResponse.jsonPath().get("message").toString());
+        Assertions.assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
+        Assertions.assertEquals(StatusConstant.STATUS_CODE_MESSAGE, deleteResponse.jsonPath().get("message").toString());
     }
 
     @Test
@@ -121,9 +123,9 @@ public class OrderTest {
 
         // ASSERT
         Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, fetchNotValidOrderId.getStatusCode());
-        Assertions.assertEquals("1", fetchNotValidOrderId.jsonPath().get("code").toString());
-        Assertions.assertEquals("error", fetchNotValidOrderId.jsonPath().get("type").toString());
-        Assertions.assertEquals("Order not found", fetchNotValidOrderId.jsonPath().get("message").toString());
+        Assertions.assertEquals(StatusConstant.STATUS_CODE, fetchNotValidOrderId.jsonPath().get("code").toString());
+        Assertions.assertEquals(StatusConstant.STATUS_CODE_TYPE, fetchNotValidOrderId.jsonPath().get("type").toString());
+        Assertions.assertEquals(StatusConstant.STATUS_CODE_NOT_FOUND, fetchNotValidOrderId.jsonPath().get("message").toString());
     }
 
 }
