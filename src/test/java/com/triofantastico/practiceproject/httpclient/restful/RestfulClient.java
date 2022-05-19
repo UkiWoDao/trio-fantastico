@@ -20,7 +20,6 @@ public abstract class RestfulClient {
                 .setRelaxedHTTPSValidation()
                 .build();
     }
-
     protected static Response sendRequest(RequestSpecification rSpec, Method method) {
          return given()
                     .spec(rSpec).relaxedHTTPSValidation().request(method)
