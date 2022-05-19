@@ -78,12 +78,12 @@ class OrderTest {
         // ACT
         Response response = orderClient.post(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
-        Integer orderId = RandomGenerator.getNegative(createdOrder.getId());
+        Integer orderId = Math.toIntExact(-createdOrder.getId());
 
         Response deleteResponse = orderClient.delete(orderId);
 
         // ASSERT
-        Assertions.assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
+        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
         Assertions.assertEquals(StatusConstant.STATUS_CODE_MESSAGE, deleteResponse.jsonPath().get("message").toString());
     }
 
