@@ -18,4 +18,9 @@ public final class RandomGenerator {
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
         return min + threadLocalRandom.nextInt(max);
     }
+    public static Integer getNegative (Long id) {
+        int minus = -1;
+        Integer aNegativeId = Math.toIntExact((id * minus));
+        return aNegativeId;
+    }
 }
