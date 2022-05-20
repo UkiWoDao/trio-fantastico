@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.triofantastico.practiceproject.constant.ResponseConstant;
 import com.triofantastico.practiceproject.httpclient.restful.PetClient;
 import com.triofantastico.practiceproject.model.pet.Pet;
+import com.triofantastico.practiceproject.model.responses.Errors;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
@@ -50,13 +51,14 @@ class PetTest {
         // ACT
         Response fetchedPetResponse = petClient.delete(createdPet);
         Pet deleteFetchedPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
+        Errors errors = new Errors();
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, fetchedPetResponse.getStatusCode());
         Assertions.assertAll("Delete existing path should successfully retrieve this response",
-                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), fetchedPetResponse.jsonPath().get("code").toString()),
-                () -> assertEquals(ResponseConstant.UNKNOWN, fetchedPetResponse.jsonPath().get("type").toString()),
-                () -> assertEquals(deleteFetchedPet.getId().toString(), fetchedPetResponse.jsonPath().get("message").toString())
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errors.getErrorCode(fetchedPetResponse)),
+                () -> assertEquals(ResponseConstant.UNKNOWN, errors.getErrorType(fetchedPetResponse)),
+                () -> assertEquals(deleteFetchedPet.getId().toString(), errors.getErrorMessage(fetchedPetResponse))
                             );
     }
 
