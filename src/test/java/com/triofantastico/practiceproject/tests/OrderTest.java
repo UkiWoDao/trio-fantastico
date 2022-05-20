@@ -2,8 +2,9 @@ package com.triofantastico.practiceproject.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.triofantastico.practiceproject.constant.StatusConstant;
+import com.triofantastico.practiceproject.constant.ResponseConstant;
 import com.triofantastico.practiceproject.httpclient.restful.OrderClient;
+import com.triofantastico.practiceproject.junit.annotations.WIP;
 import com.triofantastico.practiceproject.model.order.Order;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@WIP
 class OrderTest {
 
     @Test
@@ -23,7 +25,7 @@ class OrderTest {
         Order desiredOrder = Order.createValidRandomOrder();
 
         // ACT
-        Response response = orderClient.post(desiredOrder);
+        Response response = orderClient.create(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
         String shipJsonDate = createdOrder.getShipDate();
 
@@ -56,20 +58,19 @@ class OrderTest {
         OrderClient orderClient = new OrderClient();
         Order desiredOrder = Order.createValidRandomOrder();
 
-        Response response = orderClient.post(desiredOrder);
+        Response response = orderClient.create(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
-        Integer orderId = Math.toIntExact(createdOrder.getId());
 
         // ACT
-        Response deleteResponse = orderClient.delete(orderId);
+        Response deleteResponse = orderClient.deleteOrderById(createdOrder.getId());
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
-        Assertions.assertAll("Delete existing path should successfully retrieve this response",
-                () -> assertEquals(StatusConstant.STATUS_CODE_OK, deleteResponse.jsonPath().get("code").toString()),
-                () -> assertEquals(StatusConstant.MESSAGE_TYPE, deleteResponse.jsonPath().get("type").toString()),
-                () -> assertEquals(createdOrder.getId().toString(), deleteResponse.jsonPath().get("message").toString())
-                            );
+        Assertions.assertAll("Delete existing pet should successfully return specified response",
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), deleteResponse.jsonPath().get("code").toString()),
+                () -> assertEquals(ResponseConstant.UNKNOWN, deleteResponse.jsonPath().get("type").toString()),
+                () -> assertEquals(createdOrder.getId().toString(), deleteResponse.jsonPath().get("message"))
+            );
     }
 
     @Test
@@ -80,18 +81,18 @@ class OrderTest {
         OrderClient orderClient = new OrderClient();
         Order desiredOrder = Order.createValidRandomOrder();
 
-        Response response = orderClient.post(desiredOrder);
+        Response response = orderClient.create(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
-        Integer orderId = Math.toIntExact(-createdOrder.getId());
+        Long invalidOrderId = -createdOrder.getId();
 
         // ACT
-        Response deleteResponse = orderClient.delete(orderId);
+        Response deleteResponse = orderClient.deleteOrderById(invalidOrderId);
 
         // ASSERT
         assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
-        assertEquals(StatusConstant.STATUS_CODE_NOT_FOUND, deleteResponse.jsonPath().get("code").toString());
-        assertEquals(StatusConstant.MESSAGE_TYPE, deleteResponse.jsonPath().get("type").toString());
-        assertEquals(StatusConstant.STATUS_CODE_MESSAGE, deleteResponse.jsonPath().get("message").toString());
+        assertEquals(String.valueOf(HttpStatus.SC_NOT_FOUND), deleteResponse.jsonPath().get("code").toString());
+        assertEquals(ResponseConstant.UNKNOWN, deleteResponse.jsonPath().get("type").toString());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), deleteResponse.jsonPath().get("message").toString().toLowerCase());
     }
 
     @Test
@@ -102,13 +103,12 @@ class OrderTest {
         OrderClient orderClient = new OrderClient();
         Order desiredOrder = Order.createValidRandomOrder();
 
-        Response response = orderClient.post(desiredOrder);
+        Response response = orderClient.create(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
         String shipJsonDate = createdOrder.getShipDate();
-        Integer orderId = Math.toIntExact(createdOrder.getId());
 
         // ACT
-        Response fetchValidOrderId = orderClient.getOrderById(orderId);
+        Response fetchValidOrderId = orderClient.getOrderById(createdOrder.getId());
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, fetchValidOrderId.getStatusCode());
@@ -120,25 +120,24 @@ class OrderTest {
     }
 
     @Test
-    void attempting_to_get_not_valid_purchase_order_by_id_should_return_spec_response() throws JsonProcessingException {
+    void attempting_to_get_order_by_invalid_id_should_return_an_error_response() throws JsonProcessingException {
         // ARRANGE
         ObjectMapper objectMapper = new ObjectMapper();
 
         OrderClient orderClient = new OrderClient();
         Order desiredOrder = Order.createValidRandomOrder();
 
-        Response response = orderClient.post(desiredOrder);
+        Response response = orderClient.create(desiredOrder);
         Order createdOrder = objectMapper.readValue(response.getBody().asString(), Order.class);
-        Integer orderId = Math.toIntExact(-createdOrder.getId());
+        Long invalidOrderId = -createdOrder.getId();
 
         // ACT
-        Response fetchNotValidOrderId = orderClient.getOrderById(orderId);
+        Response invalidGetOrderById = orderClient.getOrderById(invalidOrderId);
 
         // ASSERT
-        assertEquals(HttpStatus.SC_NOT_FOUND, fetchNotValidOrderId.getStatusCode());
-        assertEquals(StatusConstant.STATUS_CODE, fetchNotValidOrderId.jsonPath().get("code").toString());
-        assertEquals(StatusConstant.STATUS_CODE_TYPE, fetchNotValidOrderId.jsonPath().get("type").toString());
-        assertEquals(StatusConstant.MESSAGE_NOT_FOUND, fetchNotValidOrderId.jsonPath().get("message").toString());
+        assertEquals(HttpStatus.SC_NOT_FOUND, invalidGetOrderById.getStatusCode());
+        assertEquals(ResponseConstant.ONE, invalidGetOrderById.jsonPath().get("code").toString());
+        assertEquals(ResponseConstant.ERROR, invalidGetOrderById.jsonPath().get("type").toString());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), invalidGetOrderById.jsonPath().get("message").toString().toLowerCase());
     }
-
 }

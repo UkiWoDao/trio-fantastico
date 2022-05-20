@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public abstract class RestfulClient {
 
-    protected static final String PETSTORE_BASE_URL = YamlConfigHandler.getEnvironmentConfig().getBeUrl();
+    protected static final String PET_STORE_BASE_URL = YamlConfigHandler.getEnvironmentConfig().getBeUrl();
 
     protected static RequestSpecification getCommonReqSpec() {
         return new RequestSpecBuilder()

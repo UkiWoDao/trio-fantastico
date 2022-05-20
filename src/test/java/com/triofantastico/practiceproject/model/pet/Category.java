@@ -19,8 +19,8 @@ public class Category {
     public static Category createRandomValidCategory() {
         int tenThousand = 10000;
         return Category.builder()
-                .id(RandomGenerator.getRandomNumberPositiveNumberUpTo(tenThousand))
-                .name("categoryName" + RandomGenerator.getRandomNumberPositiveNumberUpTo(tenThousand))
+                .id(RandomGenerator.getRandomPositiveNumberUpTo(tenThousand))
+                .name("categoryName" + RandomGenerator.getRandomPositiveNumberUpTo(tenThousand))
                 .build();
     }
 }

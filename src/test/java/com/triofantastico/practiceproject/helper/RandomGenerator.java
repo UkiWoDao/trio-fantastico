@@ -13,14 +13,9 @@ public final class RandomGenerator {
         return min + threadLocalRandom.nextInt(max);
     }
 
-    public static Integer getRandomNumberPositiveNumberUpTo(int max) {
+    public static Integer getRandomPositiveNumberUpTo(int max) {
         int min = 1;
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
         return min + threadLocalRandom.nextInt(max);
-    }
-    public static Integer getNegative (Long id) {
-        int minus = -1;
-        Integer aNegativeId = Math.toIntExact((id * minus));
-        return aNegativeId;
     }
 }

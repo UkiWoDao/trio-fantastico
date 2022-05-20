@@ -6,13 +6,11 @@ import io.restassured.response.Response;
 
 public class OrderClient extends RestfulClient
 {
-    private static final String ORDER_URI = PETSTORE_BASE_URL + "/store";
+    private static final String STORE_URL = PET_STORE_BASE_URL + "/store";
+    private static final String STORE_ORDER_URL = STORE_URL + "/order/";
 
-    public Response post(Order order) { return sendRequest(getCommonReqSpec().baseUri(ORDER_URI + "/" + "order").body(order), Method.POST); }
-
-    public Response getInventory() { return sendRequest(getCommonReqSpec().baseUri(ORDER_URI + "/" + "inventory"), Method.GET); }
-
-    public Response getOrderById(Integer orderId) { return sendRequest(getCommonReqSpec().baseUri(ORDER_URI + "/" + "order" + "/" + orderId), Method.GET); }
-
-    public Response delete(Integer orderId) { return sendRequest(getCommonReqSpec().baseUri(ORDER_URI + "/" + "order" + "/" + orderId), Method.DELETE); }
+    public Response create(Order order) { return sendRequest(getCommonReqSpec().baseUri(STORE_URL + "/" + "order").body(order), Method.POST); }
+    public Response getInventory() { return sendRequest(getCommonReqSpec().baseUri(STORE_URL + "/" + "inventory"), Method.GET); }
+    public Response getOrderById(Long orderId) { return sendRequest(getCommonReqSpec().baseUri(STORE_ORDER_URL + orderId), Method.GET); }
+    public Response deleteOrderById(Long orderId) { return sendRequest(getCommonReqSpec().baseUri(STORE_ORDER_URL + orderId), Method.DELETE); }
 }

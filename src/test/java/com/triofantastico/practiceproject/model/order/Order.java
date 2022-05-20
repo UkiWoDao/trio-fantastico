@@ -24,17 +24,17 @@ public class Order {
     private static final int MAX_INT = 1000;
     private static final int MAX_DAYS = 30;
 
-
     public static Order createValidRandomOrder() {
+        final int upToThirty = RandomGenerator.getRandomPositiveNumberUpTo(30);
+        final String futureDatetimeInNextThirtyDays = LocalDateTime.now().plusDays(upToThirty)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
 
         return Order.builder()
-                .petId(Long.valueOf(RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT)))
-                .quantity(Long.valueOf(RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT)))
-                .shipDate(LocalDateTime.now().plusDays(RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_DAYS))
-                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")))
-                .status("status" + RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT))
+                .petId(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT)))
+                .quantity(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT)))
+                .shipDate(futureDatetimeInNextThirtyDays)
+                .status("status" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT))
                 .complete(nextBoolean())
                 .build();
     }
-
 }

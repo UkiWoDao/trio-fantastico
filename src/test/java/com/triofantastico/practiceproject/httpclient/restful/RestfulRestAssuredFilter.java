@@ -17,9 +17,9 @@ class RestfulRestAssuredFilter implements Filter {
             log.error("{} {} => \n Response headers => {} \n Response status => {} {} \n Response body => {}", requestSpec.getMethod(),
                     requestSpec.getURI(), response.getHeaders(), response.getStatusCode(), response.getStatusLine(), response.getBody());
         }
-        log.info("{} {} \n Request body => {} \n Response status => {} {} \n Response body => {}", requestSpec.getMethod(),
-                requestSpec.getURI(), requestSpec.getBody(), response.getStatusCode(), response.getStatusLine(),
-                response.getBody().prettyPrint());
+        log.info("{} {} \n Request headers => {} \n Request body => {} \n Response status => {} {} \n Response body => {}",
+                requestSpec.getMethod(), requestSpec.getURI(), requestSpec.getHeaders(), requestSpec.getBody(), response.getStatusCode(),
+                response.getStatusLine(), response.getBody().prettyPrint());
         return response;
     }
 }

@@ -2,9 +2,8 @@ package com.triofantastico.practiceproject.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.triofantastico.practiceproject.constant.StatusConstant;
+import com.triofantastico.practiceproject.constant.ResponseConstant;
 import com.triofantastico.practiceproject.httpclient.restful.PetClient;
-import com.triofantastico.practiceproject.junit.annotations.WIP;
 import com.triofantastico.practiceproject.model.pet.Pet;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
@@ -24,7 +23,7 @@ class PetTest {
         Pet desiredPet = Pet.createValidRandomPet();
 
         // ACT
-        Response response = petClient.add(desiredPet);
+        Response response = petClient.create(desiredPet);
         Pet createdPet = objectMapper.readValue(response.getBody().asString(), Pet.class);
 
         // ASSERT
@@ -44,7 +43,7 @@ class PetTest {
         PetClient petClient = new PetClient();
         Pet desiredPet = Pet.createValidRandomPet();
 
-        Response createdPetResponse = petClient.add(desiredPet);
+        Response createdPetResponse = petClient.create(desiredPet);
         Pet createdPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
         assertEquals(HttpStatus.SC_OK, createdPetResponse.getStatusCode());
 
@@ -55,8 +54,8 @@ class PetTest {
         // ASSERT
         assertEquals(HttpStatus.SC_OK, fetchedPetResponse.getStatusCode());
         Assertions.assertAll("Delete existing path should successfully retrieve this response",
-                () -> assertEquals(StatusConstant.STATUS_CODE_OK, fetchedPetResponse.jsonPath().get("code").toString()),
-                () -> assertEquals(StatusConstant.MESSAGE_TYPE, fetchedPetResponse.jsonPath().get("type").toString()),
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), fetchedPetResponse.jsonPath().get("code").toString()),
+                () -> assertEquals(ResponseConstant.UNKNOWN, fetchedPetResponse.jsonPath().get("type").toString()),
                 () -> assertEquals(deleteFetchedPet.getId().toString(), fetchedPetResponse.jsonPath().get("message").toString())
                             );
     }
@@ -69,7 +68,7 @@ class PetTest {
         PetClient petClient = new PetClient();
         Pet desiredPet = Pet.createValidRandomPet();
 
-        Response createdPetResponse = petClient.add(desiredPet);
+        Response createdPetResponse = petClient.create(desiredPet);
         Pet createdPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
         assertEquals(HttpStatus.SC_OK, createdPetResponse.getStatusCode());
 
@@ -86,24 +85,23 @@ class PetTest {
         assertEquals(createdPet.getTags(), fetchedPet.getTags());
     }
 
-    @WIP
     @Test
-    void update_existing_pet_should_retrieve_pet_with_new_values() throws JsonProcessingException {
+    void updating_existing_pet_should_retrieve_pet_with_new_values() throws JsonProcessingException {
         // ARRANGE
         ObjectMapper objectMapper = new ObjectMapper();
 
         PetClient petClient = new PetClient();
         Pet desiredPet = Pet.createValidRandomPet();
 
-        Response createdPetResponse = petClient.add(desiredPet);
+        Response createdPetResponse = petClient.create(desiredPet);
         Pet createdPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
         assertEquals(HttpStatus.SC_OK, createdPetResponse.getStatusCode());
 
-        // ACT
         Pet desiredUpdatedPet = Pet.createValidRandomPet();
         desiredUpdatedPet.setId(createdPet.getId());
 
-        Response createUpdatePetResponse = petClient.put(desiredUpdatedPet);
+        // ACT
+        Response createUpdatePetResponse = petClient.update(desiredUpdatedPet);
         Pet updatedPet = objectMapper.readValue(createUpdatePetResponse.getBody().asString(), Pet.class);
 
         // ASSERT

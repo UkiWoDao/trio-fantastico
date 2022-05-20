@@ -18,8 +18,8 @@ public class Tag {
     public static Tag createRandomValidTag() {
         int tenThousand = 10000;
         return Tag.builder()
-                .id(RandomGenerator.getRandomNumberPositiveNumberUpTo(tenThousand))
-                .name("tagName" + RandomGenerator.getRandomNumberPositiveNumberUpTo(tenThousand))
+                .id(RandomGenerator.getRandomPositiveNumberUpTo(tenThousand))
+                .name("tagName" + RandomGenerator.getRandomPositiveNumberUpTo(tenThousand))
                 .build();
     }
 }

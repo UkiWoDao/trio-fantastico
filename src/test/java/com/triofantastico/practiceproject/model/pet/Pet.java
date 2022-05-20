@@ -21,11 +21,11 @@ public class Pet {
     private static final int MAX_INT = 1000;
 
     public static Pet createValidRandomPet() {
-        int upToFive = RandomGenerator.getRandomNumberPositiveNumberUpTo(5);
+        int upToFive = RandomGenerator.getRandomPositiveNumberUpTo(5);
         return Pet.builder()
-                .name("name" + RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT))
+                .name("name" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT))
                 .category(Category.createRandomValidCategory())
-                .status("status" + RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT))
+                .status("status" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT))
                 .photoUrls(getANumberOfRandomUrls(upToFive))
                 .tags(getANumberOfRandomTags(upToFive))
                 .build();
@@ -34,7 +34,7 @@ public class Pet {
      private static ArrayList<String> getANumberOfRandomUrls(int count) {
         ArrayList<String> listOfUrls = new ArrayList<>();
         for(int i = 0; i < count; i++) {
-            listOfUrls.add("https://petdomain.com/" + RandomGenerator.getRandomNumberPositiveNumberUpTo(MAX_INT));
+            listOfUrls.add("https://petdomain.com/" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT));
         }
         return listOfUrls;
      }
