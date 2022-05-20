@@ -64,14 +64,15 @@ class OrderTest {
 
         // ACT
         Response deleteResponse = orderClient.deleteOrderById(createdOrder.getId());
-        Errors errors = new Errors();
+        Errors errorResponse = objectMapper.readValue(deleteResponse.getBody().asString(), Errors.class);
+
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
         Assertions.assertAll("Delete existing pet should successfully return specified response",
-                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errors.getErrorCode(deleteResponse)),
-                () -> assertEquals(ResponseConstant.UNKNOWN, errors.getErrorType(deleteResponse)),
-                () -> assertEquals(createdOrder.getId().toString(), errors.getErrorMessage(deleteResponse))
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errorResponse.getCode()),
+                () -> assertEquals(ResponseConstant.UNKNOWN, errorResponse.getType()),
+                () -> assertEquals(createdOrder.getId().toString(), errorResponse.getMessage())
             );
     }
 
@@ -89,13 +90,13 @@ class OrderTest {
 
         // ACT
         Response deleteResponse = orderClient.deleteOrderById(invalidOrderId);
-        Errors errors = new Errors();
+        Errors errorResponse = objectMapper.readValue(deleteResponse.getBody().asString(), Errors.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
-        assertEquals(String.valueOf(HttpStatus.SC_NOT_FOUND), errors.getErrorCode(deleteResponse));
-        assertEquals(ResponseConstant.UNKNOWN, errors.getErrorType(deleteResponse));
-        assertEquals(ResponseConstant.ORDER_NOT_FOUND, errors.getErrorMessage(deleteResponse));
+        assertEquals(String.valueOf(HttpStatus.SC_NOT_FOUND), errorResponse.getCode());
+        assertEquals(ResponseConstant.UNKNOWN, errorResponse.getType());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND, errorResponse.getMessage());
     }
 
     @Test
@@ -136,12 +137,12 @@ class OrderTest {
 
         // ACT
         Response invalidGetOrderById = orderClient.getOrderById(invalidOrderId);
-        Errors errors = new Errors();
+        Errors errorResponse = objectMapper.readValue(invalidGetOrderById.getBody().asString(), Errors.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_NOT_FOUND, invalidGetOrderById.getStatusCode());
-        assertEquals(ResponseConstant.ONE, errors.getErrorCode(invalidGetOrderById));
-        assertEquals(ResponseConstant.ERROR, errors.getErrorType(invalidGetOrderById));
-        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), errors.getErrorMessage(invalidGetOrderById).toLowerCase());
+        assertEquals(ResponseConstant.ONE, errorResponse.getCode());
+        assertEquals(ResponseConstant.ERROR, errorResponse.getType());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), errorResponse.getMessage().toLowerCase());
     }
 }

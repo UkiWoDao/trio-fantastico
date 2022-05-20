@@ -51,14 +51,14 @@ class PetTest {
         // ACT
         Response fetchedPetResponse = petClient.delete(createdPet);
         Pet deleteFetchedPet = objectMapper.readValue(createdPetResponse.getBody().asString(), Pet.class);
-        Errors errors = new Errors();
+        Errors errorResponse = objectMapper.readValue(fetchedPetResponse.getBody().asString(), Errors.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, fetchedPetResponse.getStatusCode());
         Assertions.assertAll("Delete existing path should successfully retrieve this response",
-                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errors.getErrorCode(fetchedPetResponse)),
-                () -> assertEquals(ResponseConstant.UNKNOWN, errors.getErrorType(fetchedPetResponse)),
-                () -> assertEquals(deleteFetchedPet.getId().toString(), errors.getErrorMessage(fetchedPetResponse))
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errorResponse.getCode()),
+                () -> assertEquals(ResponseConstant.UNKNOWN, errorResponse.getType()),
+                () -> assertEquals(deleteFetchedPet.getId().toString(), errorResponse.getMessage())
                             );
     }
 
