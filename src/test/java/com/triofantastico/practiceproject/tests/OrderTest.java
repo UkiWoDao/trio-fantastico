@@ -6,6 +6,7 @@ import com.triofantastico.practiceproject.constant.ResponseConstant;
 import com.triofantastico.practiceproject.httpclient.restful.OrderClient;
 import com.triofantastico.practiceproject.junit.annotations.WIP;
 import com.triofantastico.practiceproject.model.order.Order;
+import com.triofantastico.practiceproject.model.responses.Errors;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
@@ -63,13 +64,15 @@ class OrderTest {
 
         // ACT
         Response deleteResponse = orderClient.deleteOrderById(createdOrder.getId());
+        Errors errorResponse = objectMapper.readValue(deleteResponse.getBody().asString(), Errors.class);
+
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, deleteResponse.getStatusCode());
         Assertions.assertAll("Delete existing pet should successfully return specified response",
-                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), deleteResponse.jsonPath().get("code").toString()),
-                () -> assertEquals(ResponseConstant.UNKNOWN, deleteResponse.jsonPath().get("type").toString()),
-                () -> assertEquals(createdOrder.getId().toString(), deleteResponse.jsonPath().get("message"))
+                () -> assertEquals(String.valueOf(HttpStatus.SC_OK), errorResponse.getCode()),
+                () -> assertEquals(ResponseConstant.UNKNOWN, errorResponse.getType()),
+                () -> assertEquals(createdOrder.getId().toString(), errorResponse.getMessage())
             );
     }
 
@@ -87,12 +90,13 @@ class OrderTest {
 
         // ACT
         Response deleteResponse = orderClient.deleteOrderById(invalidOrderId);
+        Errors errorResponse = objectMapper.readValue(deleteResponse.getBody().asString(), Errors.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_NOT_FOUND, deleteResponse.getStatusCode());
-        assertEquals(String.valueOf(HttpStatus.SC_NOT_FOUND), deleteResponse.jsonPath().get("code").toString());
-        assertEquals(ResponseConstant.UNKNOWN, deleteResponse.jsonPath().get("type").toString());
-        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), deleteResponse.jsonPath().get("message").toString().toLowerCase());
+        assertEquals(String.valueOf(HttpStatus.SC_NOT_FOUND), errorResponse.getCode());
+        assertEquals(ResponseConstant.UNKNOWN, errorResponse.getType());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND, errorResponse.getMessage());
     }
 
     @Test
@@ -133,11 +137,12 @@ class OrderTest {
 
         // ACT
         Response invalidGetOrderById = orderClient.getOrderById(invalidOrderId);
+        Errors errorResponse = objectMapper.readValue(invalidGetOrderById.getBody().asString(), Errors.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_NOT_FOUND, invalidGetOrderById.getStatusCode());
-        assertEquals(ResponseConstant.ONE, invalidGetOrderById.jsonPath().get("code").toString());
-        assertEquals(ResponseConstant.ERROR, invalidGetOrderById.jsonPath().get("type").toString());
-        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), invalidGetOrderById.jsonPath().get("message").toString().toLowerCase());
+        assertEquals(ResponseConstant.ONE, errorResponse.getCode());
+        assertEquals(ResponseConstant.ERROR, errorResponse.getType());
+        assertEquals(ResponseConstant.ORDER_NOT_FOUND.toLowerCase(), errorResponse.getMessage().toLowerCase());
     }
 }
