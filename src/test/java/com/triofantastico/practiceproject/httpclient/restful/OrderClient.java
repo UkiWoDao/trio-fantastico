@@ -4,7 +4,7 @@ import com.triofantastico.practiceproject.model.order.Order;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 
-public class OrderClient extends RestfulClient
+public class OrderClient extends HttpClient
 {
     private static final String STORE_URL = PET_STORE_BASE_URL + "/store";
     private static final String STORE_ORDER_URL = STORE_URL + "/order/";
