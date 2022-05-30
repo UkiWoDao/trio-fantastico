@@ -13,5 +13,6 @@ public class YamlConfigModel {
     public static class Profile {
         private String name;
         @JsonProperty("be-url") private String beUrl;
+        @JsonProperty("gql-url") private String gqlUrl;
     }
 }

@@ -1,0 +1,5 @@
+query getLaunches($limit: Int!){
+    launches(limit: $limit) {
+        mission_name
+    }
+}

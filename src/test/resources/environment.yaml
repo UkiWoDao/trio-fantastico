@@ -2,6 +2,11 @@
 environment-profiles:
   - name: qa
     be-url: https://petstore.swagger.io/v2
+    gql-url: https://api.spacex.land/graphql/
 
   - name: prod
     be-url: https://petstore.swagger.io/v2
+    gql-url: https://api.spacex.land/graphql/
+
+
+
