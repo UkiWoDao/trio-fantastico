@@ -62,6 +62,9 @@ dependencies {
         because("we want to be able to write custom assertions")
     }
 
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation("commons-io:commons-io:2.11.0")
+
 }
 
 test {
