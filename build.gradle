@@ -19,6 +19,7 @@ ext {
     slf4jVersion = '1.7.36'
     restAssuredVersion = '4.5.1'
     assertjVersion = '3.22.0'
+    graphqlCodegenVersion = '5.4.0'
 }
 
 dependencies {
@@ -62,6 +63,8 @@ dependencies {
         because("we want to be able to write custom assertions")
     }
 
+    // https://mvnrepository.com/artifact/io.github.kobylynskyi/graphql-java-codegen
+    implementation "io.github.kobylynskyi:graphql-java-codegen:$graphqlCodegenVersion"
 }
 
 test {
