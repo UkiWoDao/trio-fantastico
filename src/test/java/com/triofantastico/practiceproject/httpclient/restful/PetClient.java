@@ -7,7 +7,7 @@ import com.triofantastico.practiceproject.model.pet.Pet;
 
 import java.util.Map;
 
-public class PetClient extends RestfulClient {
+public class PetClient extends HttpClient {
 
     private static final String PET_URL = PET_STORE_BASE_URL + "/pet";
     private final Map<String, String> apiKeyHeader = Map.of("api_key", ConfigurationManager.getAuthConfigInstance().apikey());
