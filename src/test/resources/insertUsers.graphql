@@ -1,0 +1,9 @@
+mutation insert_users($id: uuid!, $name: String!, $rocket: String!) {
+    insert_users(objects: {id: $id, name: $name, rocket: $rocket}) {
+        returning {
+            id
+            name
+            rocket
+        }
+    }
+}

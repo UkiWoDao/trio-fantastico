@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.triofantastico.practiceproject.httpclient.restful.GraphqlClient;
 import com.triofantastico.practiceproject.model.gql.Company;
 import com.triofantastico.practiceproject.model.gql.GraphQLQuery;
+import com.triofantastico.practiceproject.model.gql.User;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
@@ -107,6 +108,34 @@ class GqlTest {
         }
 
         assertEquals(expRes,listOfMissionNames);
+    }
+
+    @Test
+    void check_data_from_valid_random_added_user() throws IOException {
+        // ARRANGE
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File("src/test/resources/insertUsers.graphql");
+        ObjectNode variables = new ObjectMapper().createObjectNode();
+        variables.put("id", String.valueOf(User.createValidRandomUser().getId()));
+        variables.put("name", User.createValidRandomUser().getName());
+        variables.put("rocket", User.createValidRandomUser().getRocket());
+
+        GraphqlClient graphqlClient = new GraphqlClient();
+        String graphqlPayload = graphqlClient.parseGraphql(file,variables);
+
+        // ACT
+        Response response = graphqlClient.create(graphqlPayload);
+
+        // ASSERT
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+
+        JsonNode node = objectMapper.readTree(response.getBody().asString());
+        ArrayNode coordinatesNode =(ArrayNode) node.at("/data/insert_users/returning");
+        for (JsonNode nod:coordinatesNode) {
+            assertEquals(variables.findValue("id").asText(),nod.get("id").asText());
+            assertEquals(variables.findValue("name").asText(),nod.get("name").asText());
+            assertEquals(variables.findValue("rocket").asText(),nod.get("rocket").asText());
+        }
     }
 
 }
