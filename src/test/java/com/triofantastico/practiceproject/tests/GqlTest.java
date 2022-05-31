@@ -11,6 +11,7 @@ import com.triofantastico.practiceproject.model.gql.User;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -114,14 +115,18 @@ class GqlTest {
     void check_data_from_valid_random_added_user() throws IOException {
         // ARRANGE
         ObjectMapper objectMapper = new ObjectMapper();
+
         File file = new File("src/test/resources/insertUsers.graphql");
+
+        User user = User.createValidRandomUser();
+
         ObjectNode variables = new ObjectMapper().createObjectNode();
-        variables.put("id", String.valueOf(User.createValidRandomUser().getId()));
-        variables.put("name", User.createValidRandomUser().getName());
-        variables.put("rocket", User.createValidRandomUser().getRocket());
+        variables.put("id", String.valueOf(user.getId()));
+        variables.put("name", user.getName());
+        variables.put("rocket", user.getRocket());
 
         GraphqlClient graphqlClient = new GraphqlClient();
-        String graphqlPayload = graphqlClient.parseGraphql(file,variables);
+        String graphqlPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
         Response response = graphqlClient.create(graphqlPayload);
@@ -130,11 +135,13 @@ class GqlTest {
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
         JsonNode node = objectMapper.readTree(response.getBody().asString());
-        ArrayNode coordinatesNode =(ArrayNode) node.at("/data/insert_users/returning");
-        for (JsonNode nod:coordinatesNode) {
-            assertEquals(variables.findValue("id").asText(),nod.get("id").asText());
-            assertEquals(variables.findValue("name").asText(),nod.get("name").asText());
-            assertEquals(variables.findValue("rocket").asText(),nod.get("rocket").asText());
+        ArrayNode coordinatesNode = (ArrayNode) node.at("/data/insert_users/returning");
+
+        for (JsonNode nod : coordinatesNode) {
+            Assertions.assertAll("User object should be handled as itended",
+                    () -> assertEquals(variables.findValue("id").asText(), nod.get("id").asText()),
+                    () -> assertEquals(variables.findValue("name").asText(), nod.get("name").asText()),
+                    () -> assertEquals(variables.findValue("rocket").asText(), nod.get("rocket").asText()));
         }
     }
 
