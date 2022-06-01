@@ -1,5 +1,6 @@
 package com.triofantastico.practiceproject.model.gql;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.triofantastico.practiceproject.helper.RandomGenerator;
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends ArrayList<User> {
 
     private UUID id;
     private String name;

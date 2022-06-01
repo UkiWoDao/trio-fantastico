@@ -55,7 +55,7 @@ class GqlTest {
         String graphPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
-        Response response = graphqlClient.create(graphPayload);
+        Response response = graphqlClient.send(graphPayload);
         JsonNode node = objectMapper.readTree(response.getBody().asString());
         JsonNode coordinatesNode = node.at("/data/company");
 
@@ -97,7 +97,7 @@ class GqlTest {
         String graphqlPayload = graphqlClient.parseGraphql(file,variables);
 
         // ACT
-        Response response = graphqlClient.create(graphqlPayload);
+        Response response = graphqlClient.send(graphqlPayload);
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -129,19 +129,22 @@ class GqlTest {
         String graphqlPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
-        Response response = graphqlClient.create(graphqlPayload);
+        Response response = graphqlClient.send(graphqlPayload);
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
 
-        JsonNode node = objectMapper.readTree(response.getBody().asString());
-        ArrayNode coordinatesNode = (ArrayNode) node.at("/data/insert_users/returning");
+        JsonNode responseNode = objectMapper.readTree(response.getBody().asString());
+        ArrayNode coordinatesNode = (ArrayNode) responseNode.at("/data/insert_users/returning");
 
-        for (JsonNode nod : coordinatesNode) {
+        ArrayList<User> returningUsersList = objectMapper.treeToValue(coordinatesNode, User.class);
+
+        for (int i=0; i < returningUsersList.size(); i++) {
+            int finalI = i;
             Assertions.assertAll("User object should be handled as itended",
-                    () -> assertEquals(variables.findValue("id").asText(), nod.get("id").asText()),
-                    () -> assertEquals(variables.findValue("name").asText(), nod.get("name").asText()),
-                    () -> assertEquals(variables.findValue("rocket").asText(), nod.get("rocket").asText()));
+                    () -> assertEquals(String.valueOf(user.getId()),String.valueOf(returningUsersList.get(finalI).getId())),
+                    () -> assertEquals(user.getName(), returningUsersList.get(finalI).getName()),
+                    () -> assertEquals(user.getRocket(), returningUsersList.get(finalI).getRocket()));
         }
     }
 
