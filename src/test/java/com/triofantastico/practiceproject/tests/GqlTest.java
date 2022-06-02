@@ -33,15 +33,15 @@ class GqlTest {
         query.setQuery("{ company { name ceo coo } }");
 
         given().
-            contentType(ContentType.JSON).
-            body(query).
-        when().
-            post("https://api.spacex.land/graphql/").
-        then().
-            assertThat().
-            statusCode(200).
-            and().
-            body("data.company.ceo", equalTo("Elon Musk"));
+                contentType(ContentType.JSON).
+                body(query).
+                when().
+                post("https://api.spacex.land/graphql/").
+                then().
+                assertThat().
+                statusCode(200).
+                and().
+                body("data.company.ceo", equalTo("Elon Musk"));
     }
 
     @Test
@@ -83,7 +83,7 @@ class GqlTest {
                 "COTS 1",
                 "TürkmenÄlem 52°E / MonacoSAT",
                 "CRS-11"
-                )
+        )
         );
 
         List<String> listOfMissionNames = new ArrayList<>();
@@ -91,10 +91,10 @@ class GqlTest {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File("src/test/resources/retrieveTenLaunches.graphql");
         ObjectNode variables = new ObjectMapper().createObjectNode();
-        variables.put("limit",LIMIT);
+        variables.put("limit", LIMIT);
 
         GraphqlClient graphqlClient = new GraphqlClient();
-        String graphqlPayload = graphqlClient.parseGraphql(file,variables);
+        String graphqlPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
         Response response = graphqlClient.send(graphqlPayload);
@@ -104,11 +104,11 @@ class GqlTest {
 
         JsonNode node = objectMapper.readTree(response.getBody().asString());
         ArrayNode coordinatesNode = (ArrayNode) node.at("/data/launches");
-        for (JsonNode nod:coordinatesNode) {
+        for (JsonNode nod : coordinatesNode) {
             listOfMissionNames.add(nod.get("mission_name").asText());
         }
 
-        assertEquals(expRes,listOfMissionNames);
+        assertEquals(expRes, listOfMissionNames);
     }
 
     @Test
@@ -139,12 +139,12 @@ class GqlTest {
 
         ArrayList<User> returningUsersList = objectMapper.treeToValue(coordinatesNode, User.class);
 
-        for (int i=0; i < returningUsersList.size(); i++) {
-            int finalI = i;
+        int lastElement = returningUsersList.size() - 1;
+        for (int i = 0; i < returningUsersList.size(); i++) {
             Assertions.assertAll("User object should be handled as itended",
-                    () -> assertEquals(String.valueOf(user.getId()),String.valueOf(returningUsersList.get(finalI).getId())),
-                    () -> assertEquals(user.getName(), returningUsersList.get(finalI).getName()),
-                    () -> assertEquals(user.getRocket(), returningUsersList.get(finalI).getRocket()));
+                    () -> assertEquals(String.valueOf(user.getId()), String.valueOf(returningUsersList.get(lastElement).getId())),
+                    () -> assertEquals(user.getName(), returningUsersList.get(lastElement).getName()),
+                    () -> assertEquals(user.getRocket(), returningUsersList.get(lastElement).getRocket()));
         }
     }
 
