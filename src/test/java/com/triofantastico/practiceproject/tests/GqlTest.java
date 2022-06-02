@@ -35,9 +35,9 @@ class GqlTest {
         given().
                 contentType(ContentType.JSON).
                 body(query).
-                when().
+        when().
                 post("https://api.spacex.land/graphql/").
-                then().
+        then().
                 assertThat().
                 statusCode(200).
                 and().
