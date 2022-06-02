@@ -4,13 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kobylynskyi.graphql.codegen.model.graphql.GraphQLResponseProjection;
 import com.triofantastico.practiceproject.httpclient.restful.GraphqlClient;
+import com.triofantastico.practiceproject.junit.annotations.WIP;
 import com.triofantastico.practiceproject.model.gql.Company;
 import com.triofantastico.practiceproject.model.gql.GraphQLQuery;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
+
+import com.kobylynskyi.graphql.codegen.model.graphql.GraphQLRequest;
+import com.triofantastico.practiceproject.model.graphql.generated.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,20 +31,27 @@ class GqlTest {
 
     @Test
     void getCompanyData_checkCeo_shouldBeElonMusk() {
-
         GraphQLQuery query = new GraphQLQuery();
         query.setQuery("{ company { name ceo coo } }");
 
         given().
-            contentType(ContentType.JSON).
-            body(query).
-        when().
-            post("https://api.spacex.land/graphql/").
-        then().
-            assertThat().
-            statusCode(200).
-            and().
-            body("data.company.ceo", equalTo("Elon Musk"));
+                contentType(ContentType.JSON).
+                body(query).
+                when().
+                post("https://api.spacex.land/graphql/").
+                then().
+                assertThat().
+                statusCode(200).
+                and().
+                body("data.company.ceo", equalTo("Elon Musk"));
+    }
+
+    @WIP
+    @Test
+    void codegen_test() {
+//        CompanyQueryRequest companyQueryRequest = new CompanyQueryRequest();
+//        GraphQLResponseProjection graphQLResponseProjection = new C
+//        GraphQLRequest graphQLRequest = new GraphQLRequest();
     }
 
     @Test
@@ -81,7 +93,7 @@ class GqlTest {
                 "COTS 1",
                 "TürkmenÄlem 52°E / MonacoSAT",
                 "CRS-11"
-                )
+        )
         );
 
         List<String> listOfMissionNames = new ArrayList<>();
@@ -89,10 +101,10 @@ class GqlTest {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File("src/test/resources/retrieveTenLaunches.graphql");
         ObjectNode variables = new ObjectMapper().createObjectNode();
-        variables.put("limit",LIMIT);
+        variables.put("limit", LIMIT);
 
         GraphqlClient graphqlClient = new GraphqlClient();
-        String graphqlPayload = graphqlClient.parseGraphql(file,variables);
+        String graphqlPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
         Response response = graphqlClient.create(graphqlPayload);
@@ -102,11 +114,11 @@ class GqlTest {
 
         JsonNode node = objectMapper.readTree(response.getBody().asString());
         ArrayNode coordinatesNode = (ArrayNode) node.at("/data/launches");
-        for (JsonNode nod:coordinatesNode) {
+        for (JsonNode nod : coordinatesNode) {
             listOfMissionNames.add(nod.get("mission_name").asText());
         }
 
-        assertEquals(expRes,listOfMissionNames);
+        assertEquals(expRes, listOfMissionNames);
     }
 
 }

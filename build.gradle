@@ -1,5 +1,8 @@
+import io.github.kobylynskyi.graphql.codegen.gradle.GraphQLCodegenGradleTask
+
 plugins {
     id 'java'
+    id "io.github.kobylynskyi.graphql.codegen" version "5.4.1"
 }
 
 group 'org.example'
@@ -100,4 +103,23 @@ task wip(type: Test) {
     useJUnitPlatform() {
         includeTags "wip"
     }
+}
+
+compileTestJava.dependsOn "graphqlCodegenSpacex"
+sourceSets.test.java.srcDir("$buildDir/generated-client")
+task graphqlCodegenSpacex(type: GraphQLCodegenGradleTask) {
+    String schemaPath = "$projectDir/src/test/resources/schema.graphql"
+    graphqlSchemaPaths = new ArrayList<String>(){};
+    graphqlSchemaPaths.add(schemaPath);
+    outputDir = new File("$buildDir/generated-client")
+    modelPackageName = "com.triofantastico.practiceproject.model.graphql.generated"
+    customTypesMapping = [
+            DateTime: "java.util.Date"
+    ]
+    modelNameSuffix = "TO"
+    generateApis = false
+    generateClient = true
+    generateBuilder = true
+    responseProjectionSuffix = true
+    generateParameterizedFieldsResolvers = false
 }
