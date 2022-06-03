@@ -1,5 +1,6 @@
 package com.triofantastico.practiceproject.tests;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -11,13 +12,12 @@ import com.triofantastico.practiceproject.model.gql.User;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -26,9 +26,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GqlTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+    private static final String GRAPHQL_FILE_PACKAGE_PATH = "src/test/resources/graphql/";
+
     @Test
     void getCompanyData_checkCeo_shouldBeElonMusk() {
-
         GraphQLQuery query = new GraphQLQuery();
         query.setQuery("{ company { name ceo coo } }");
 
@@ -47,19 +50,17 @@ class GqlTest {
     @Test
     void getCompanyData_checkCeo_shouldBeElonMusk_through_jackson() throws IOException {
         // ARRANGE
-        ObjectMapper objectMapper = new ObjectMapper();
-        File file = new File("src/test/resources/fetchCompanyDetails.graphql");
-        ObjectNode variables = new ObjectMapper().createObjectNode();
+        File file = new File(GRAPHQL_FILE_PACKAGE_PATH + "fetchCompanyDetails.graphql");
+        ObjectNode variables = OBJECT_MAPPER.createObjectNode();
 
         GraphqlClient graphqlClient = new GraphqlClient();
         String graphPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
         Response response = graphqlClient.send(graphPayload);
-        JsonNode node = objectMapper.readTree(response.getBody().asString());
+        JsonNode node = OBJECT_MAPPER.readTree(response.getBody().asString());
         JsonNode coordinatesNode = node.at("/data/company");
-
-        Company companyDetails = objectMapper.treeToValue(coordinatesNode, Company.class);
+        Company companyDetails = OBJECT_MAPPER.treeToValue(coordinatesNode, Company.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -72,7 +73,8 @@ class GqlTest {
     void getLaunches_checkMissionName() throws IOException {
         // ARRANGE
         final int LIMIT = 10;
-        final ArrayList<String> expRes = new ArrayList<>(Arrays.asList(
+        String nonAsciiRegex = "[^\\p{ASCII}]";
+        final List<String> expectedOriginalMissionNames = List.of(
                 "Thaicom 6",
                 "AsiaSat 6",
                 "OG-2 Mission 2",
@@ -82,15 +84,18 @@ class GqlTest {
                 "ABS-3A / Eutelsat 115W B",
                 "COTS 1",
                 "TürkmenÄlem 52°E / MonacoSAT",
-                "CRS-11"
-        )
-        );
+                "CRS-11");
 
-        List<String> listOfMissionNames = new ArrayList<>();
+        List<String> expectedNormalizedMissionNames = new ArrayList<>();
+        for (String missionName : expectedOriginalMissionNames) {
+            Normalizer.normalize(missionName, Normalizer.Form.NFD);
+            missionName = missionName.replaceAll(nonAsciiRegex, "");
+            expectedNormalizedMissionNames.add(missionName);
+        }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        File file = new File("src/test/resources/retrieveTenLaunches.graphql");
-        ObjectNode variables = new ObjectMapper().createObjectNode();
+        List<String> actualNormalizedMissionNames = new ArrayList<>();
+        File file = new File(GRAPHQL_FILE_PACKAGE_PATH + "retrieveLaunches.graphql");
+        ObjectNode variables = OBJECT_MAPPER.createObjectNode();
         variables.put("limit", LIMIT);
 
         GraphqlClient graphqlClient = new GraphqlClient();
@@ -98,54 +103,46 @@ class GqlTest {
 
         // ACT
         Response response = graphqlClient.send(graphqlPayload);
+        JsonNode responseNode = OBJECT_MAPPER.readTree(response.getBody().asString());
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        ArrayNode coordinatesNode = (ArrayNode) responseNode.at("/data/launches");
 
-        JsonNode node = objectMapper.readTree(response.getBody().asString());
-        ArrayNode coordinatesNode = (ArrayNode) node.at("/data/launches");
-        for (JsonNode nod : coordinatesNode) {
-            listOfMissionNames.add(nod.get("mission_name").asText());
+        for (JsonNode node : coordinatesNode) {
+            String preNormalizedMissionName = node.get("mission_name").asText();
+            Normalizer.normalize(preNormalizedMissionName, Normalizer.Form.NFD);
+            String normalizedMissionName = preNormalizedMissionName.replaceAll(nonAsciiRegex, "");
+            actualNormalizedMissionNames.add(normalizedMissionName);
         }
 
-        assertEquals(expRes, listOfMissionNames);
+        assertEquals(expectedNormalizedMissionNames, actualNormalizedMissionNames);
     }
 
     @Test
     void check_data_from_valid_random_added_user() throws IOException {
         // ARRANGE
-        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File(GRAPHQL_FILE_PACKAGE_PATH + "insertUsers.graphql");
 
-        File file = new File("src/test/resources/insertUsers.graphql");
-
-        User user = User.createValidRandomUser();
+        User desiredUser = User.createValidRandomUser();
 
         ObjectNode variables = new ObjectMapper().createObjectNode();
-        variables.put("id", String.valueOf(user.getId()));
-        variables.put("name", user.getName());
-        variables.put("rocket", user.getRocket());
+        variables.put("id", String.valueOf(desiredUser.getId()));
+        variables.put("name", desiredUser.getName());
+        variables.put("rocket", desiredUser.getRocket());
 
         GraphqlClient graphqlClient = new GraphqlClient();
         String graphqlPayload = graphqlClient.parseGraphql(file, variables);
 
         // ACT
         Response response = graphqlClient.send(graphqlPayload);
+        String responseBody = response.getBody().asString();
+        int singleElement = 0;
+        String jsonNodeString = OBJECT_MAPPER.readTree(responseBody).at("/data/insert_users/returning").get(singleElement).toString();
+        User returnedUser = OBJECT_MAPPER.readValue(jsonNodeString, User.class);
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
-
-        JsonNode responseNode = objectMapper.readTree(response.getBody().asString());
-        ArrayNode coordinatesNode = (ArrayNode) responseNode.at("/data/insert_users/returning");
-
-        ArrayList<User> returningUsersList = objectMapper.treeToValue(coordinatesNode, User.class);
-
-        int lastElement = returningUsersList.size() - 1;
-        for (int i = 0; i < returningUsersList.size(); i++) {
-            Assertions.assertAll("User object should be handled as itended",
-                    () -> assertEquals(String.valueOf(user.getId()), String.valueOf(returningUsersList.get(lastElement).getId())),
-                    () -> assertEquals(user.getName(), returningUsersList.get(lastElement).getName()),
-                    () -> assertEquals(user.getRocket(), returningUsersList.get(lastElement).getRocket()));
-        }
+        assertEquals(desiredUser, returnedUser);
     }
-
 }
