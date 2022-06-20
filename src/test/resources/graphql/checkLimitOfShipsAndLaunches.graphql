@@ -1,0 +1,10 @@
+query getFiveShips($limit: Int!){
+    launchesPast(limit: $limit) {
+        ships {
+            name
+            home_port
+            image
+        }
+        launch_date_local
+    }
+}

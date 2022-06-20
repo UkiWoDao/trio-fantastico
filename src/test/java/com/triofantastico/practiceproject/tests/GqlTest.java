@@ -1,14 +1,14 @@
 package com.triofantastico.practiceproject.tests;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.triofantastico.practiceproject.httpclient.restful.GraphqlClient;
-import com.triofantastico.practiceproject.model.gql.Company;
-import com.triofantastico.practiceproject.model.gql.GraphQLQuery;
-import com.triofantastico.practiceproject.model.gql.User;
+import com.triofantastico.practiceproject.model.gql.*;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GqlTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String GRAPHQL_FILE_PACKAGE_PATH = "src/test/resources/graphql/";
 
     @Test
@@ -144,5 +144,43 @@ class GqlTest {
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
         assertEquals(desiredUser, returnedUser);
+    }
+
+    @Test
+    void getNumberOfShipsLaunces_checkDetails() throws IOException {
+        // ARRANGE
+        final int LIMIT = 3;
+        Ship ship1 = new Ship("GO Ms Tree", "Port Canaveral", "https://i.imgur.com/MtEgYbY.jpg");
+        Ship ship2 = new Ship("GO Ms Chief", "Port Canaveral", "https://imgur.com/NHsx95l.jpg");
+        Ship ship3 = new Ship("Just Read The Instructions 2", "Port of Los Angeles", "https://i.imgur.com/7VMC0Gn.jpg");
+        Ship ship4 = new Ship("GO Quest", "Port Canaveral", "https://i.imgur.com/ABXtHKa.jpg");
+        Ship ship5 = new Ship("Of Course I Still Love You", "Port Canaveral", "https://i.imgur.com/28dCx6G.jpg");
+
+        final List<Ship> expectedShipsResult = List.of(ship1, ship2, ship3, ship4, ship5);
+
+        File file = new File(GRAPHQL_FILE_PACKAGE_PATH + "checkLimitOfShipsAndLaunches.graphql");
+        ObjectNode variables = OBJECT_MAPPER.createObjectNode();
+        variables.put("limit", LIMIT);
+
+        GraphqlClient graphqlClient = new GraphqlClient();
+        String graphqlPayload = graphqlClient.parseGraphql(file, variables);
+
+        // ACT
+        Response response = graphqlClient.send(graphqlPayload);
+        String responseBody = response.getBody().asString();
+        JsonNode launchesPastNode = OBJECT_MAPPER.readTree(responseBody).at("/data/launchesPast");
+
+        ObjectReader reader = OBJECT_MAPPER.readerFor(new TypeReference<List<Ships>>() { });
+
+        List<Ships> shipsList = reader.readValue(launchesPastNode);
+        List<Ship> actualShipList = new ArrayList<>();
+
+        for (Ships ships : shipsList) {
+            actualShipList.addAll(ships.getShips());
+        }
+        System.out.println(actualShipList);
+
+        // ASSERT
+        assertTrue(actualShipList.containsAll(expectedShipsResult));
     }
 }
