@@ -1,6 +1,7 @@
 package com.triofantastico.practiceproject.helper.assertions;
 
 import com.triofantastico.practiceproject.model.pet.Pet;
+
 import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.Assertions;
 

@@ -13,13 +13,13 @@ public class StopwatchListener implements TestExecutionListener {
     private static final long START_TIME = System.nanoTime();
 
     public void testPlanExecutionStarted(TestPlan testPlan) {
-        log.info("Stopwatch started at: " + LocalTime.now().toString());
+        log.info("Stopwatch started at: " + LocalTime.now());
     }
 
     public void testPlanExecutionFinished(TestPlan testPlan) {
         long elapsedTime = System.nanoTime() - START_TIME;
         long convertedNanoTime = TimeUnit.SECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS);
-        log.info("Stopwatch stopped at: " + LocalTime.now().toString() + ". Elapsed time rounded to seconds: "
+        log.info("Stopwatch stopped at: " + LocalTime.now() + ". Elapsed time rounded to seconds: "
                 + convertedNanoTime + "s");
     }
 }

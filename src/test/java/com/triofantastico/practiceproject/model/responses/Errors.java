@@ -1,15 +1,7 @@
 package com.triofantastico.practiceproject.model.responses;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Errors {
-
-    private String code;
-    private String type;
-    private String message;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record Errors(String code, String type, String message) {
 }

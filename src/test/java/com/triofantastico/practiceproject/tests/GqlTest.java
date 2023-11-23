@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.triofantastico.practiceproject.httpclient.restful.GraphqlClient;
 import com.triofantastico.practiceproject.model.gql.*;
+
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
@@ -32,12 +33,12 @@ class GqlTest {
 
     @Test
     void getCompanyData_checkCeo_shouldBeElonMusk() {
-        GraphQLQuery query = new GraphQLQuery();
-        query.setQuery("{ company { name ceo coo } }");
+        String query = "{ company { name ceo coo } }";
+        GraphQLQuery gqlQuery = new GraphQLQuery(query, null);
 
         given().
                 contentType(ContentType.JSON).
-                body(query).
+                body(gqlQuery).
         when().
                 post("https://api.spacex.land/graphql/").
         then().
@@ -64,9 +65,9 @@ class GqlTest {
 
         // ASSERT
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
-        assertEquals("SpaceX", companyDetails.getName());
-        assertEquals("Elon Musk", companyDetails.getCeo());
-        assertEquals("Gwynne Shotwell", companyDetails.getCoo());
+        assertEquals("SpaceX", companyDetails.name());
+        assertEquals("Elon Musk", companyDetails.ceo());
+        assertEquals("Gwynne Shotwell", companyDetails.coo());
     }
 
     @Test
@@ -87,6 +88,7 @@ class GqlTest {
                 "CRS-11");
 
         List<String> expectedNormalizedMissionNames = new ArrayList<>();
+
         for (String missionName : expectedOriginalMissionNames) {
             Normalizer.normalize(missionName, Normalizer.Form.NFD);
             missionName = missionName.replaceAll(nonAsciiRegex, "");
@@ -127,9 +129,9 @@ class GqlTest {
         User desiredUser = User.createValidRandomUser();
 
         ObjectNode variables = new ObjectMapper().createObjectNode();
-        variables.put("id", String.valueOf(desiredUser.getId()));
-        variables.put("name", desiredUser.getName());
-        variables.put("rocket", desiredUser.getRocket());
+        variables.put("id", String.valueOf(desiredUser.id()));
+        variables.put("name", desiredUser.name());
+        variables.put("rocket", desiredUser.rocket());
 
         GraphqlClient graphqlClient = new GraphqlClient();
         String graphqlPayload = graphqlClient.parseGraphql(file, variables);
@@ -147,7 +149,7 @@ class GqlTest {
     }
 
     @Test
-    void getNumberOfShipsLaunces_checkDetails() throws IOException {
+    void getNumberOfShipsLaunches_checkDetails() throws IOException {
         // ARRANGE
         final int LIMIT = 3;
         Ship ship1 = new Ship("GO Ms Tree", "Port Canaveral", "https://i.imgur.com/MtEgYbY.jpg");
@@ -176,9 +178,8 @@ class GqlTest {
         List<Ship> actualShipList = new ArrayList<>();
 
         for (Ships ships : shipsList) {
-            actualShipList.addAll(ships.getShips());
+            actualShipList.addAll(ships.ships());
         }
-        System.out.println(actualShipList);
 
         // ASSERT
         assertTrue(actualShipList.containsAll(expectedShipsResult));

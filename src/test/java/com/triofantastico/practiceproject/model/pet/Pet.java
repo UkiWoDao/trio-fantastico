@@ -1,7 +1,12 @@
 package com.triofantastico.practiceproject.model.pet;
 
 import com.triofantastico.practiceproject.helper.RandomGenerator;
-import lombok.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 
@@ -31,19 +36,23 @@ public class Pet {
                 .build();
     }
 
-     private static ArrayList<String> getANumberOfRandomUrls(int count) {
+    private static ArrayList<String> getANumberOfRandomUrls(int count) {
         ArrayList<String> listOfUrls = new ArrayList<>();
-        for(int i = 0; i < count; i++) {
+
+        for (int i = 0; i < count; i++) {
             listOfUrls.add("https://petdomain.com/" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT));
         }
+
         return listOfUrls;
-     }
+    }
 
     private static ArrayList<Tag> getANumberOfRandomTags(int count) {
         ArrayList<Tag> listOfTags = new ArrayList<>();
-        for(int i = 0; i < count; i++) {
+
+        for (int i = 0; i < count; i++) {
             listOfTags.add(Tag.createRandomValidTag());
         }
+
         return listOfTags;
     }
 }

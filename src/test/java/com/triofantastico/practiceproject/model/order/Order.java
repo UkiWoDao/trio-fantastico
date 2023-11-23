@@ -1,7 +1,12 @@
 package com.triofantastico.practiceproject.model.order;
 
 import com.triofantastico.practiceproject.helper.RandomGenerator;
-import lombok.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,19 +26,18 @@ public class Order {
     private String status;
     private Boolean complete;
 
-    private static final int MAX_INT = 1000;
-    private static final int MAX_DAYS = 30;
-
     public static Order createValidRandomOrder() {
+        int upperNumberLimit = 1000;
+
         final int upToThirty = RandomGenerator.getRandomPositiveNumberUpTo(30);
         final String futureDatetimeInNextThirtyDays = LocalDateTime.now().plusDays(upToThirty)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
 
         return Order.builder()
-                .petId(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT)))
-                .quantity(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT)))
+                .petId(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(upperNumberLimit)))
+                .quantity(Long.valueOf(RandomGenerator.getRandomPositiveNumberUpTo(upperNumberLimit)))
                 .shipDate(futureDatetimeInNextThirtyDays)
-                .status("status" + RandomGenerator.getRandomPositiveNumberUpTo(MAX_INT))
+                .status("status" + RandomGenerator.getRandomPositiveNumberUpTo(upperNumberLimit))
                 .complete(nextBoolean())
                 .build();
     }

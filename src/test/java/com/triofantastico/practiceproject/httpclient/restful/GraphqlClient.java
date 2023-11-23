@@ -13,7 +13,10 @@ import java.nio.charset.StandardCharsets;
 
 public class GraphqlClient extends HttpClient {
 
-    public Response send(String request) { return sendRequest(getCommonGqlReqSpec(request).baseUri(GQL_ENDPOINT_URL), Method.POST); }
+    public Response send(String request) {
+        return sendRequest(getCommonGqlReqSpec(request)
+                .baseUri(GQL_ENDPOINT_URL), Method.POST);
+    }
 
     public String parseGraphql(File file, ObjectNode variables) throws IOException {
         String graphqlFileContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
@@ -25,7 +28,7 @@ public class GraphqlClient extends HttpClient {
         ObjectNode oNode = oMapper.createObjectNode();
         oNode.put("query", graphqlQuery);
         oNode.set("variables", variables);
+
         return oMapper.writeValueAsString(oNode);
     }
-
 }

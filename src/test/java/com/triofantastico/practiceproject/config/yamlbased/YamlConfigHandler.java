@@ -15,7 +15,9 @@ public class YamlConfigHandler {
 
     private @Getter @Setter static YamlConfigModel.Profile environmentConfig;
 
-    private YamlConfigHandler() { throw new AssertionError("Instantiation attempted from within class"); }
+    private YamlConfigHandler() {
+        throw new AssertionError("Instantiation attempted from within class");
+    }
 
     public static void setConfigByEnvironmentName(String envName) throws IOException {
         final String yamlPropertiesPath = "src/test/resources/environment.yaml";
@@ -24,7 +26,9 @@ public class YamlConfigHandler {
         YamlConfigModel environmentList = mapper.readValue(yamlFile, YamlConfigModel.class);
 
         try {
-            setEnvironmentConfig(environmentList.getProfiles().stream().filter(env -> env.getName().equals(envName)).findAny()
+            setEnvironmentConfig(environmentList.getProfiles().stream()
+                    .filter(env -> env.getName().equals(envName))
+                    .findAny()
                     .orElseThrow());
         } catch (NoSuchElementException ex) {
             log.error("Config for environment: \"" + envName + "\" is not present in file \"" + yamlPropertiesPath + "\";' " +

@@ -3,6 +3,7 @@ package com.triofantastico.practiceproject.config.propertybased;
 import org.aeonbits.owner.ConfigCache;
 
 import static com.triofantastico.practiceproject.constant.PropertyNameConstant.TARGET_ENV;
+
 import static org.aeonbits.owner.util.Collections.map;
 
 public final class ConfigurationManager {
